@@ -7,7 +7,7 @@ app.secret_key = "super_secret_legal_key_123"
 
 # 🔥 FIXED: Cloud environments (Render) ke liye safe database path setup
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, 'legal_marketplace.db')
+DB_PATH = os.path.join(BASE_DIR, 'legal_marketplace_v2.db')
 
 def init_db():
     conn = sqlite3.connect(DB_PATH)
