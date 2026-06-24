@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Book Expert Consultation</h2>
+    <p class="subtitle">Connect directly with elite government policy advisors.</p>
+    
+    <div class="fee-notice" style="background-color: #ecfdf5; border-left: 4px solid #10b981; color: #065f46;">
+        <b>💳 Mandatory Consultation Processing Fee:</b> To connect with this premium ministry consultant, a platform integration & registration charge of <b>₹1,500</b> applies.
+    </div>
+
+    <div style="background: #f1f5f9; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <span class="tag">{{ expert[2] }}</span>
+        <h3 style="margin: 10px 0 5px 0;">Booking For: {{ expert[1] }}</h3>
+        <p style="margin: 0; font-size: 14px; color: #475569;"><b>Designation:</b> {{ expert[3] }}</p>
+    </div>
+
+    <form action="{{ url_for('book_consultation', expert_id=expert[0]) }}" method="POST">
+        <label>Your Full Name / Organization Name</label>
+        <input type="text" name="client_name" placeholder="Enter your name or company name" required>
+
+        <label>Email Address</label>
+        <input type="email" name="client_email" placeholder="yourname@email.com" required>
+
+        <label>Mobile Number (For WhatsApp/Call connection)</label>
+        <input type="tel" name="client_phone" placeholder="Enter 10 digit mobile number" required>
+
+        <label>Describe Your Legal Problem / Requirement</label>
+        <textarea name="problem_description" placeholder="Explain your issue with Ayush licensing, Energy tenders, or policy compliance in detail..." rows="5" required></textarea>
+
+        <button type="submit" class="btn-submit" style="background-color: #10b981;">Pay ₹1,500 & Connect with Expert</button>
+    </form>
+</div>
+{% endblock %}

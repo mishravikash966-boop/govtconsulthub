@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 class="section-title" style="text-align: center; margin-bottom: 5px; color: #0f2b46; font-size: 28px;">
+    ⚖️ Verified Ministry & Legal Advisory Panel
+</h2>
+<p style="text-align: center; color: #64748b; margin-bottom: 40px; font-size: 16px;">
+    Property matton, Central Ministry regulations aur policy files ke liye expert salah lein.
+</p>
+
+<div class="grid">
+    {% if experts %}
+        {% for expert in experts %}
+        <div class="expert-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <span class="tag" style="background: #fef3c7; color: #b45309;">
+                    {{ expert[2] }}
+                </span>
+                
+                <h3 style="margin: 15px 0 5px 0; font-size: 20px; color: #0f2b46;">{{ expert[1] }}</h3>
+                <p class="designation" style="color: #475569; margin-bottom: 5px;"><strong>Role:</strong> {{ expert[3] }} ({{ expert[4] }}+ Yrs Exp)</p>
+                <p class="spec" style="color: #64748b; font-size: 14px; margin-bottom: 15px;"><strong>Domain Expert:</strong> {{ expert[5] }}</p>
+                
+                <!-- DYNAMIC LINK LOGIC FOR RICH FEEL PROFILE CV -->
+                <div style="margin: 15px 0;">
+                    {% if expert[0] == 1 %}
+                        <a href="/expert/santosh" target="_blank" 
+                           style="display: inline-block; background-color: #f1f5f9; color: #1d4ed8; text-decoration: none; padding: 8px 15px; border-radius: 5px; font-size: 13px; font-weight: bold; border: 1px solid #cbd5e1; width: 100%; text-align: center; box-sizing: border-box;">
+                           📄 View Premium Experience CV
+                        </a>
+                    {% else %}
+                        <a href="#" 
+                           style="display: inline-block; background-color: #f1f5f9; color: #64748b; text-decoration: none; padding: 8px 15px; border-radius: 5px; font-size: 13px; font-weight: bold; border: 1px solid #cbd5e1; width: 100%; text-align: center; box-sizing: border-box; cursor: not-allowed;">
+                           📄 View Experience CV
+                        </a>
+                    {% endif %}
+                </div>
+                
+                <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 15px 0;">
+                
+                <div class="service-box" style="background: #f8fafc; padding: 15px; border-radius: 6px; border-left: 3px solid #f59e0b; margin-bottom: 20px;">
+                    <h4 style="margin: 0 0 5px 0; color: #0f2b46; font-size: 14px;">💼 Guidance Scope / Service:</h4>
+                    <p style="margin: 0; font-size: 13.5px; color: #334155; line-height: 1.5;">{{ expert[6] }}</p>
+                </div>
+            </div>
+
+            <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; background: #fafafa; padding: 10px; border-radius: 5px; margin-top: auto;">
+                <span class="price" style="font-size: 12px; color: #64748b;">Processing Charges:<br><b style="color: #0f2b46; font-size: 18px;">₹{{ expert[7] }}</b></span>
+                <a href="{{ url_for('book_consultation', expert_id=expert[0]) }}" class="btn-buy" style="text-decoration: none; text-align: center; padding: 10px 20px; font-size: 14px; background-color: #f59e0b;">Book Session</a>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p style="text-align: center; color: #94a3b8; width: 100%;">No consultants found in this category.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="hero-container" style="background: linear-gradient(135deg, #0f2b46 0%, #1e3a8a 100%); padding: 50px; text-align: center; color: white; display: block;">
+    <h1 style="color: white; font-size: 36px; margin-bottom: 15px;">Welcome to Premium Expert Advisory Hub</h1>
+    <p style="color: #93c5fd; font-size: 18px; max-width: 800px; margin: 0 auto 30px;">
+        Desh ke top level Central Ministry Advisors aur Senior IT Corporate Consultants se judne ka ekmatra platform. Apni zaroorat ke mutabik sahi gateway chunein:
+    </p>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px;">
+    
+    <div style="background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 15px rgba(0,0,0,0.05); border-top: 6px solid #f59e0b; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+            <span style="font-size: 40px;">⚖️</span>
+            <h2 style="color: #0f2b46; margin-top: 15px;">Ministry & Legal Advisory</h2>
+            <p style="font-weight: 500; color: #334155; font-size: 15.5px; line-height: 1.6; margin-bottom: 20px;">
+                Ghar, zameen ya parivarik property ka har mamla hoga ab hal. Sirf ek click mein desh ke top ministry experts se payein pakki legal consultancy—bina kisi jhijhak, seedhe aur sateek!
+            </p>
+        </div>
+        <a href="{{ url_for('view_experts', category='Legal') }}" class="btn-main" style="background: #f59e0b; box-shadow: 0 4px 6px rgba(245, 158, 11, 0.3); text-align: center;">Enter Legal Marketplace →</a>
+    </div>
+
+    <div style="background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 15px rgba(0,0,0,0.05); border-top: 6px solid #10b981; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+            <span style="font-size: 40px;">💻</span>
+            <h2 style="color: #0f2b46; margin-top: 15px;">IT & Technology Mentorship</h2>
+            <p style="font-weight: 500; color: #334155; font-size: 15.5px; line-height: 1.6; margin-bottom: 20px;">
+                MCA, B.Tech aur BCA ke computer background students ke liye career advice, resume vetting aur programming/AI automation doubts ke liye Senior Consultants, Project Managers aur Team Leads se live One-to-One mentorship.
+            </p>
+        </div>
+        <a href="{{ url_for('view_experts', category='IT') }}" class="btn-main" style="background: #10b981; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3); text-align: center;">Enter IT Mentorship Hub →</a>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GovtConsult | Hub - Premium Advisory & Mentorship</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="logo" style="cursor: pointer;" onclick="window.location.href='/'">
+            GovtConsult <span style="color: #cbd5e1; font-weight: normal; margin: 0 8px;">|</span> <b>Hub</b>
+        </div>
+        <nav style="display: flex; align-items: center; gap: 15px;">
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('view_experts', category='Legal') }}" style="color: #f59e0b; font-weight: bold;">⚖️ Ministry & Legal</a>
+            <a href="{{ url_for('view_experts', category='IT') }}" class="btn-nav" style="background-color: #10b981;">💻 IT & Tech Mentorship</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div style="background-color: #d1e7dd; color: #0f5132; padding: 15px; border-radius: 6px; margin-bottom: 25px; font-weight: bold; border-left: 5px solid #10b981;">
+                        ✨ {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %} {% endblock %}
+    </div>
+
+    <footer>
+        <p>&copy; 2026 GovtConsult Hub Platform. All Rights Reserved.</p>
+    </footer>
+</body>
+</html>
