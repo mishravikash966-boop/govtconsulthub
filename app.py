@@ -1,75 +1,80 @@
 import sqlite3
 import os
+import traceback
 from flask import Flask, render_template, request, redirect, url_for, flash
 
 app = Flask(__name__)
 app.secret_key = "super_secret_legal_key_123"
 
-# 🔥 FIXED: Cloud environments (Render) ke liye safe database path setup
+# Cloud environments (Render) ke liye safe database path setup
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Humne naam v2 rakha hai taaki fresh DB bane
 DB_PATH = os.path.join(BASE_DIR, 'legal_marketplace_v2.db')
 
 def init_db():
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS experts (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            ministry TEXT NOT NULL,
-            last_designation TEXT NOT NULL,
-            experience INTEGER NOT NULL,
-            specialization TEXT NOT NULL,
-            readymade_service TEXT NOT NULL,
-            price REAL NOT NULL
-        )
-    ''')
-    
-    # Check & Add Column category
     try:
-        cursor.execute("ALTER TABLE experts ADD COLUMN category TEXT DEFAULT 'Legal'")
-        conn.commit()
-    except sqlite3.OperationalError:
-        pass
-
-    # Check & Add Column is_active
-    try:
-        cursor.execute("ALTER TABLE experts ADD COLUMN is_active INTEGER DEFAULT 1")
-        conn.commit()
-    except sqlite3.OperationalError:
-        pass
-
-    # Client Bookings Table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS bookings (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            client_name TEXT NOT NULL,
-            client_email TEXT NOT NULL,
-            client_phone TEXT NOT NULL,
-            expert_id INTEGER NOT NULL,
-            problem_description TEXT NOT NULL,
-            payment_status TEXT DEFAULT 'Paid (₹1,500 Platform Fee)'
-        )
-    ''')
-    
-    # Check to insert default experts safely
-    cursor.execute("SELECT COUNT(*) FROM experts")
-    if cursor.fetchone()[0] == 0:
-        demo_experts = [
-            ("Advocate Santosh Upadhyay", "AIIMS New Delhi / Ex-Ministry of AYUSH & MNRE", "Legal Advisor", 13, "Constitutional, Healthcare Laws & Public Policy", "Premium legal advisory on Healthcare regulations, institutional governance, MNRE/AYUSH compliance auditing, and High Court/Supreme Court litigation blueprint.", 50000, "Legal", 1),
-            ("Advocate Shri Prakash Mishra", "Ministry of AYUSH", "Ex-Chief Legal Consultant", 25, "Drug Licensing & Regulatory Compliance", "Complete documentation framework and standard compliance file for launching an Ayush Medical College or Hospital.", 45000, "Legal", 1),
-            ("Shri Ravindra Nath Trivedi", "Ministry of Power / Energy", "Ex-Senior Advisor (Legal)", 28, "Electricity Act & Govt Bidding", "Detailed legal evaluation report, policy compliance check, and drafting format for Hydro/Solar Project Tenders.", 60000, "Legal", 1),
-            ("Vikash Kumar", "PMU - IMUIS Project (AIIMS)", "Senior Consultant / Technical Officer", 12, "Python, AI Automation & System Design", "One-to-One Career Guidance, Resume Vetting, and Technical Architecture suggestions for IT Sector Growth and Interview cracking.", 30000, "IT", 1)
-        ]
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
         
-        cursor.executemany('''
-            INSERT INTO experts (id, name, ministry, last_designation, experience, specialization, readymade_service, price, category, is_active)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', [(i+1, e[0], e[1], e[2], e[3], e[4], e[5], e[6], e[7], e[8]) for i, e in enumerate(demo_experts)])
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS experts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                ministry TEXT NOT NULL,
+                last_designation TEXT NOT NULL,
+                experience INTEGER NOT NULL,
+                specialization TEXT NOT NULL,
+                readymade_service TEXT NOT NULL,
+                price REAL NOT NULL
+            )
+        ''')
         
-    conn.commit()
-    conn.close()
+        # Check & Add Column category
+        try:
+            cursor.execute("ALTER TABLE experts ADD COLUMN category TEXT DEFAULT 'Legal'")
+            conn.commit()
+        except sqlite3.OperationalError:
+            pass
+
+        # Check & Add Column is_active
+        try:
+            cursor.execute("ALTER TABLE experts ADD COLUMN is_active INTEGER DEFAULT 1")
+            conn.commit()
+        except sqlite3.OperationalError:
+            pass
+
+        # Client Bookings Table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS bookings (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                client_name TEXT NOT NULL,
+                client_email TEXT NOT NULL,
+                client_phone TEXT NOT NULL,
+                expert_id INTEGER NOT NULL,
+                problem_description TEXT NOT NULL,
+                payment_status TEXT DEFAULT 'Paid (₹1,500 Platform Fee)'
+            )
+        ''')
+        
+        # Check to insert default experts safely
+        cursor.execute("SELECT COUNT(*) FROM experts")
+        if cursor.fetchone()[0] == 0:
+            demo_experts = [
+                ("Advocate Santosh Upadhyay", "AIIMS New Delhi / Ex-Ministry of AYUSH & MNRE", "Legal Advisor", 13, "Constitutional, Healthcare Laws & Public Policy", "Premium legal advisory on Healthcare regulations, institutional governance, MNRE/AYUSH compliance auditing, and High Court/Supreme Court litigation blueprint.", 50000, "Legal", 1),
+                ("Advocate Shri Prakash Mishra", "Ministry of AYUSH", "Ex-Chief Legal Consultant", 25, "Drug Licensing & Regulatory Compliance", "Complete documentation framework and standard compliance file for launching an Ayush Medical College or Hospital.", 45000, "Legal", 1),
+                ("Shri Ravindra Nath Trivedi", "Ministry of Power / Energy", "Ex-Senior Advisor (Legal)", 28, "Electricity Act & Govt Bidding", "Detailed legal evaluation report, policy compliance check, and drafting format for Hydro/Solar Project Tenders.", 60000, "Legal", 1),
+                ("Vikash Kumar", "PMU - IMUIS Project (AIIMS)", "Senior Consultant / Technical Officer", 12, "Python, AI Automation & System Design", "One-to-One Career Guidance, Resume Vetting, and Technical Architecture suggestions for IT Sector Growth and Interview cracking.", 30000, "IT", 1)
+            ]
+            
+            cursor.executemany('''
+                INSERT INTO experts (id, name, ministry, last_designation, experience, specialization, readymade_service, price, category, is_active)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', [(i+1, e[0], e[1], e[2], e[3], e[4], e[5], e[6], e[7], e[8]) for i, e in enumerate(demo_experts)])
+            
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"Database Initialization Error: {e}")
 
 @app.route('/admin/toggle-expert/<int:expert_id>')
 def toggle_expert(expert_id):
@@ -157,6 +162,20 @@ def admin_panel():
     
     conn.close()
     return render_template('admin_panel.html', bookings=all_bookings, experts=all_experts)
+
+# 🔥 DYNAMIC ERROR CATCHER: Ye code click hone par aane wale error ko chupayega nahi, balki screen par print karega!
+@app.errorhandler(500)
+def internal_server_error(e):
+    error_details = traceback.format_exc()
+    return f"""
+    <div style="font-family: monospace; padding: 20px; background: #fff5f5; color: #c53030; border: 2px solid #feb2b2; border-radius: 8px; margin: 20px;">
+        <h2 style="margin-top: 0;">⚠️ Live Application Error Detected</h2>
+        <p>Aapke website control mein niche di gayi line ya system crash hua hai:</p>
+        <pre style="background: #fff; padding: 15px; border: 1px solid #fed7d7; overflow-x: auto; font-size: 14px; border-radius: 4px;">{error_details}</pre>
+        <br>
+        <a href="/" style="background: #c53030; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-weight: bold;">← Return to Home</a>
+    </div>
+    """, 500
 
 if __name__ == '__main__':
     init_db()
