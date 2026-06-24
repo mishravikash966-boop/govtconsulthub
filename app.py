@@ -6,17 +6,16 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 app = Flask(__name__)
 app.secret_key = "super_secret_legal_key_123"
 
-# Cloud environments (Render) ke liye absolute path setup
+# Absolute path setup
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-# Humne v3 kar diya hai taaki ab ekdam fresh, clean aur final database file bane
-DB_PATH = os.path.join(BASE_DIR, 'legal_marketplace_v3.db')
+DB_PATH = os.path.join(BASE_DIR, 'legal_marketplace_v4.db')
 
 def init_db():
     try:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         
-        # 1. Experts Table Create Karein
+        # 1. Force Create Experts Table
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS experts (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -31,7 +30,7 @@ def init_db():
                 is_active INTEGER DEFAULT 1
             )''')
         
-        # 2. Bookings Table Create Karein
+        # 2. Force Create Bookings Table
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS bookings (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -43,7 +42,7 @@ def init_db():
                 payment_status TEXT DEFAULT 'Paid (₹1,500 Platform Fee)'
             )''')
         
-        # 3. Safe Check: Agar experts table khali hai, toh hi data daalein (Bina crash ke)
+        # 3. Check and Insert Data
         cursor.execute("SELECT name FROM experts LIMIT 1")
         if cursor.fetchone() is None:
             demo_experts = [
@@ -61,7 +60,12 @@ def init_db():
         conn.commit()
         conn.close()
     except Exception as e:
-        print(f"Database Initialization Error: {e}")
+        print(f"Database Init Error: {e}")
+
+# 🔥 BULLETPROOF FIX: Har request se pehle database check aur create hoga automatic!
+@app.before_request
+def auto_init_database_before_click():
+    init_db()
 
 @app.route('/admin/toggle-expert/<int:expert_id>')
 def toggle_expert(expert_id):
@@ -164,5 +168,6 @@ def internal_server_error(e):
     """, 500
 
 if __name__ == '__main__':
+    # Is block ko gunicorn seedhe ignore kar deta hai, isliye upar @app.before_request jodha hai
     init_db()
     app.run(debug=True)
