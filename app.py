@@ -5,8 +5,12 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 app = Flask(__name__)
 app.secret_key = "super_secret_legal_key_123"
 
+# 🔥 FIXED: Cloud environments (Render) ke liye safe database path setup
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, 'legal_marketplace.db')
+
 def init_db():
-    conn = sqlite3.connect('legal_marketplace.db')
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
     cursor.execute('''
@@ -49,22 +53,13 @@ def init_db():
         )
     ''')
     
-    # FORCED RESYNC: Santosh ji ko position 1 par fresh sync framework ke sath set karna
+    # Check to insert default experts safely
     cursor.execute("SELECT COUNT(*) FROM experts")
-    if cursor.fetchone()[0] < 4:
-        cursor.execute("DELETE FROM experts")
-        
+    if cursor.fetchone()[0] == 0:
         demo_experts = [
-            # 👑 1 NUMBER EXPERT - ADVOCATE SANTOSH UPADHYAY
             ("Advocate Santosh Upadhyay", "AIIMS New Delhi / Ex-Ministry of AYUSH & MNRE", "Legal Advisor", 13, "Constitutional, Healthcare Laws & Public Policy", "Premium legal advisory on Healthcare regulations, institutional governance, MNRE/AYUSH compliance auditing, and High Court/Supreme Court litigation blueprint.", 50000, "Legal", 1),
-            
-            # LEGAL EXPERT 2
             ("Advocate Shri Prakash Mishra", "Ministry of AYUSH", "Ex-Chief Legal Consultant", 25, "Drug Licensing & Regulatory Compliance", "Complete documentation framework and standard compliance file for launching an Ayush Medical College or Hospital.", 45000, "Legal", 1),
-            
-            # LEGAL EXPERT 3
             ("Shri Ravindra Nath Trivedi", "Ministry of Power / Energy", "Ex-Senior Advisor (Legal)", 28, "Electricity Act & Govt Bidding", "Detailed legal evaluation report, policy compliance check, and drafting format for Hydro/Solar Project Tenders.", 60000, "Legal", 1),
-            
-            # IT EXPERT 4
             ("Vikash Kumar", "PMU - IMUIS Project (AIIMS)", "Senior Consultant / Technical Officer", 12, "Python, AI Automation & System Design", "One-to-One Career Guidance, Resume Vetting, and Technical Architecture suggestions for IT Sector Growth and Interview cracking.", 30000, "IT", 1)
         ]
         
@@ -78,7 +73,7 @@ def init_db():
 
 @app.route('/admin/toggle-expert/<int:expert_id>')
 def toggle_expert(expert_id):
-    conn = sqlite3.connect('legal_marketplace.db')
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("SELECT is_active, name FROM experts WHERE id = ?", (expert_id,))
     row = cursor.fetchone()
@@ -98,14 +93,13 @@ def toggle_expert(expert_id):
 def index():
     return render_template('index.html')
 
-# 💥 NAYA ROUTE: Santosh Upadhyay ji ke premium HTML profile page ke liye gateway
 @app.route('/expert/santosh')
 def profile_santosh():
     return render_template('expert_santosh.html')
 
 @app.route('/experts')
 def view_experts():
-    conn = sqlite3.connect('legal_marketplace.db')
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cat_filter = request.args.get('category', 'Legal')
     
@@ -122,7 +116,7 @@ def view_experts():
 
 @app.route('/book/<int:expert_id>', methods=['GET', 'POST'])
 def book_consultation(expert_id):
-    conn = sqlite3.connect('legal_marketplace.db')
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM experts WHERE id = ?', (expert_id,))
     expert = cursor.fetchone()
@@ -148,7 +142,7 @@ def book_consultation(expert_id):
 
 @app.route('/admin-panel')
 def admin_panel():
-    conn = sqlite3.connect('legal_marketplace.db')
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
     cursor.execute('''
