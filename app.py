@@ -41,7 +41,7 @@ def create_tables_instantly(conn):
     cursor.execute("SELECT COUNT(*) FROM experts")
     if cursor.fetchone()[0] == 0:
         demo_experts = [
-            ("Advocate Santosh Upadhyay", "AIIMS New Delhi / Ex-Ministry of AYUSH & MNRE", "Legal Advisor", 13, "Constitutional, Healthcare Laws & Public Policy", "Premium legal advisory on Healthcare regulations, institutional governance, MNRE/AYUSH compliance auditing, and High Court/Supreme Court litigation blueprint.", 50000, "Legal", 1),
+            ("Advocate Santosh Kumar Upadhyay", "AIIMS New Delhi / Ex-Ministry of AYUSH & MNRE", "Legal Advisor", 13, "Constitutional, Healthcare Laws & Public Policy", "Premium legal advisory on Healthcare regulations, institutional governance, MNRE/AYUSH compliance auditing, and High Court/Supreme Court litigation blueprint.", 50000, "Legal", 1),
             ("Advocate Shri Prakash Mishra", "Ministry of AYUSH", "Ex-Chief Legal Consultant", 25, "Drug Licensing & Regulatory Compliance", "Complete documentation framework and standard compliance file for launching an Ayush Medical College or Hospital.", 45000, "Legal", 1),
             ("Shri Ravindra Nath Trivedi", "Ministry of Power / Energy", "Ex-Senior Advisor (Legal)", 28, "Electricity Act & Govt Bidding", "Detailed legal evaluation report, policy compliance check, and drafting format for Hydro/Solar Project Tenders.", 60000, "Legal", 1),
             ("Vikash Kumar", "PMU - IMUIS Project (AIIMS)", "Senior Consultant / Technical Officer", 12, "Python, AI Automation & System Design", "One-to-One Career Guidance, Resume Vetting, and Technical Architecture suggestions for IT Sector Growth and Interview cracking.", 30000, "IT", 1)
