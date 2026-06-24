@@ -6,16 +6,17 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 app = Flask(__name__)
 app.secret_key = "super_secret_legal_key_123"
 
-# Cloud environments (Render) ke liye safe database path setup
+# Cloud environments (Render) ke liye absolute path setup
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-# Humne naam v2 rakha hai taaki fresh DB bane
-DB_PATH = os.path.join(BASE_DIR, 'legal_marketplace_v2.db')
+# Humne v3 kar diya hai taaki ab ekdam fresh, clean aur final database file bane
+DB_PATH = os.path.join(BASE_DIR, 'legal_marketplace_v3.db')
 
 def init_db():
     try:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         
+        # 1. Experts Table Create Karein
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS experts (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,25 +26,12 @@ def init_db():
                 experience INTEGER NOT NULL,
                 specialization TEXT NOT NULL,
                 readymade_service TEXT NOT NULL,
-                price REAL NOT NULL
-            )
-        ''')
+                price REAL NOT NULL,
+                category TEXT DEFAULT 'Legal',
+                is_active INTEGER DEFAULT 1
+            )''')
         
-        # Check & Add Column category
-        try:
-            cursor.execute("ALTER TABLE experts ADD COLUMN category TEXT DEFAULT 'Legal'")
-            conn.commit()
-        except sqlite3.OperationalError:
-            pass
-
-        # Check & Add Column is_active
-        try:
-            cursor.execute("ALTER TABLE experts ADD COLUMN is_active INTEGER DEFAULT 1")
-            conn.commit()
-        except sqlite3.OperationalError:
-            pass
-
-        # Client Bookings Table
+        # 2. Bookings Table Create Karein
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS bookings (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -53,12 +41,11 @@ def init_db():
                 expert_id INTEGER NOT NULL,
                 problem_description TEXT NOT NULL,
                 payment_status TEXT DEFAULT 'Paid (₹1,500 Platform Fee)'
-            )
-        ''')
+            )''')
         
-        # Check to insert default experts safely
-        cursor.execute("SELECT COUNT(*) FROM experts")
-        if cursor.fetchone()[0] == 0:
+        # 3. Safe Check: Agar experts table khali hai, toh hi data daalein (Bina crash ke)
+        cursor.execute("SELECT name FROM experts LIMIT 1")
+        if cursor.fetchone() is None:
             demo_experts = [
                 ("Advocate Santosh Upadhyay", "AIIMS New Delhi / Ex-Ministry of AYUSH & MNRE", "Legal Advisor", 13, "Constitutional, Healthcare Laws & Public Policy", "Premium legal advisory on Healthcare regulations, institutional governance, MNRE/AYUSH compliance auditing, and High Court/Supreme Court litigation blueprint.", 50000, "Legal", 1),
                 ("Advocate Shri Prakash Mishra", "Ministry of AYUSH", "Ex-Chief Legal Consultant", 25, "Drug Licensing & Regulatory Compliance", "Complete documentation framework and standard compliance file for launching an Ayush Medical College or Hospital.", 45000, "Legal", 1),
@@ -163,7 +150,6 @@ def admin_panel():
     conn.close()
     return render_template('admin_panel.html', bookings=all_bookings, experts=all_experts)
 
-# 🔥 DYNAMIC ERROR CATCHER: Ye code click hone par aane wale error ko chupayega nahi, balki screen par print karega!
 @app.errorhandler(500)
 def internal_server_error(e):
     error_details = traceback.format_exc()
